@@ -1,36 +1,43 @@
 import streamlit as st
 import pandas as pd
-import joblib
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
 
 st.set_page_config(page_title="AI Churn Predictor", page_icon="📉", layout="wide")
 
-# --- Custom CSS for Sahi UI ---
 st.markdown("""
 <style>
-.big-font {font-size:22px!important; font-weight:600;}
 .stButton>button {width:100%; background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color:white; border-radius:10px; height:50px; font-size:18px;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- Load Model (Error-Proof) ---
 @st.cache_resource
-def load_model():
-    try:
-        model = joblib.load("churn.pkl")
-        return model
-    except Exception as e:
-        st.error(f"Model load me error: {e}. requirements.txt check kar.")
-        return None
+def get_model():
+    df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors='coerce')
+    df.dropna(inplace=True)
+    num_cols = ["tenure", "MonthlyCharges", "TotalCharges"]
+    cat_cols = [c for c in df.columns if c not in num_cols + ["customerID", "Churn"]]
+    X = df[num_cols + cat_cols]
+    y = df["Churn"]
 
-model = load_model()
+    pre = ColumnTransformer([
+        ("num", StandardScaler(), num_cols),
+        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols)
+    ])
+    pipe = Pipeline([("pre", pre), ("model", LogisticRegression(max_iter=1000, class_weight="balanced"))])
+    pipe.fit(X, y)
+    return pipe
 
 st.title("📉 AI Customer Churn Prediction")
-st.markdown("**Customer bhaagega ya rahega? AI se pata karo**")
+st.caption("Customer bhaagega ya rahega? AI se pata karo - by Vansh Rajput")
 st.divider()
 
-# --- Inputs in 3 Columns ---
-col1, col2, col3 = st.columns(3)
+model = get_model()
 
+col1, col2, col3 = st.columns(3)
 with col1:
     st.subheader("👤 Personal")
     gender = st.selectbox("Gender", ["Male", "Female"])
@@ -45,55 +52,34 @@ with col2:
     MultipleLines = st.selectbox("Multiple Lines", ["Yes", "No", "No phone service"])
     InternetService = st.selectbox("Internet", ["DSL", "Fiber optic", "No"])
     Contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-    PaymentMethod = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
+    PaymentMethod = st.selectbox("Payment", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
 
 with col3:
-    st.subheader("💰 Billing & Add-ons")
-    MonthlyCharges = st.number_input("Monthly Charges ($)", 0.0, 200.0, 70.0)
-    TotalCharges = st.number_input("Total Charges ($)", 0.0, 10000.0, 1500.0)
+    st.subheader("💰 Billing")
+    MonthlyCharges = st.number_input("Monthly Charges", 0.0, 200.0, 70.0)
+    TotalCharges = st.number_input("Total Charges", 0.0, 10000.0, 1500.0)
     OnlineSecurity = st.selectbox("Online Security", ["Yes", "No", "No internet service"])
     TechSupport = st.selectbox("Tech Support", ["Yes", "No", "No internet service"])
-    OnlineBackup = st.selectbox("Online Backup", ["Yes", "No", "No internet service"])
-    DeviceProtection = st.selectbox("Device Protection", ["Yes", "No", "No internet service"])
-    StreamingTV = st.selectbox("Streaming TV", ["Yes", "No", "No internet service"])
-    StreamingMovies = st.selectbox("Streaming Movies", ["Yes", "No", "No internet service"])
     PaperlessBilling = st.selectbox("Paperless Billing", ["Yes", "No"])
 
 st.divider()
-
-# --- Predict ---
 if st.button("🔮 PREDICT CHURN"):
-    if model is None:
-        st.stop()
-
     input_data = pd.DataFrame([{
         "tenure": tenure, "MonthlyCharges": MonthlyCharges, "TotalCharges": TotalCharges,
         "gender": gender, "SeniorCitizen": SeniorCitizen, "Partner": Partner, "Dependents": Dependents,
         "PhoneService": PhoneService, "MultipleLines": MultipleLines, "InternetService": InternetService,
-        "OnlineSecurity": OnlineSecurity, "OnlineBackup": OnlineBackup, "DeviceProtection": DeviceProtection,
-        "TechSupport": TechSupport, "StreamingTV": StreamingTV, "StreamingMovies": StreamingMovies,
+        "OnlineSecurity": OnlineSecurity, "OnlineBackup": "No", "DeviceProtection": "No",
+        "TechSupport": TechSupport, "StreamingTV": "No", "StreamingMovies": "No",
         "Contract": Contract, "PaperlessBilling": PaperlessBilling, "PaymentMethod": PaymentMethod
     }])
-
     pred = model.predict(input_data)[0]
-    proba = model.predict_proba(input_data)[0]
-    churn_prob = proba[1] if model.classes_[0]==0 or model.classes_[0]=='No' else proba[0]
-    # Handle if classes are ['No','Yes']
-    if hasattr(model, 'classes_') and 'Yes' in model.classes_:
-        churn_prob = proba[list(model.classes_).index('Yes')]
+    prob = model.predict_proba(input_data)[0]
+    churn_p = prob[list(model.classes_).index('Yes')]
 
-    st.markdown("### Result")
-    c1, c2 = st.columns(2)
-
-    with c1:
-        if pred == 1 or pred == "Yes":
-            st.error(f"⚠️ **CHURN HOGA** - Customer bhaag jayega!")
-        else:
-            st.success(f"✅ **SAFE HAI** - Customer nahi bhaagega")
-
-    with c2:
-        st.metric("Churn Probability", f"{churn_prob*100:.2f}%")
-        st.progress(float(churn_prob))
-
-    if churn_prob > 0.6:
-        st.warning("💡 **Action:** Is customer ko retention offer do - Discount / Free Upgrade / Loyalty Bonus")
+    if pred == "Yes":
+        st.error(f"⚠️ CHURN HOGA - {churn_p*100:.1f}% chance")
+        st.warning("Action: Discount / Offer deke roko")
+    else:
+        st.success(f"✅ SAFE HAI - {100-churn_p*100:.1f}% safe")
+    st.progress(float(churn_p))
+    st.metric("Churn Probability", f"{churn_p*100:.2f}%")
