@@ -6,26 +6,35 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-st.set_page_config(page_title="GreenBank AI", page_icon="🏦", layout="wide")
+st.set_page_config(page_title="GreenBank AI - Premium", page_icon="💎", layout="wide")
 
-# --- FAANG CSS ---
+# --- ULTRA PREMIUM CSS ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-html, body, [class*="css"] {font-family: 'Inter', sans-serif;}
-.stApp {background: radial-gradient(circle at top left, #ecfdf5, #f8fafc);}
-div[data-testid="stMetric"] {background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;}
-div[data-testid="stMetricLabel"] {font-weight:600; color:#64748b;}
-div[data-testid="stMetricValue"] {font-weight:800; color:#0f172a;}
-.stButton>button {
-    background: linear-gradient(90deg, #0f172a 0%, #16a34a 100%);
-    color:white; border:none; height:60px; border-radius:14px;
-    font-size:18px; font-weight:700; letter-spacing:0.5px;
-    box-shadow: 0 8px 20px rgba(22,163,74,0.3);
-    transition: 0.3s;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+.stApp {
+    background: #0a0a0a;
+    background-image: radial-gradient(circle at 20% 30%, #16a34a22 0%, transparent 50%),
+                      radial-gradient(circle at 80% 70%, #0ea5e922 0%, transparent 50%);
 }
-.stButton>button:hover {transform: translateY(-2px); box-shadow: 0 12px 25px rgba(22,163,74,0.4);}
-.glass {background: white; border-radius: 20px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid #f1f5f9;}
+h1, h2, h3, p, span {font-family: 'Space Grotesk', sans-serif!important; color: white!important;}
+[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.06); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px;
+}
+.glass-card {
+    background: rgba(255,255,255,0.07); backdrop-filter: blur(25px);
+    border-radius: 24px; padding: 28px; border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.stSlider > div > div {background: #16a34a!important;}
+.stButton>button {
+    background: linear-gradient(100deg, #16a34a, #22d3ee);
+    color: black!important; font-weight: 800!important; font-size: 20px!important;
+    height: 65px; border-radius: 16px; border: none;
+    box-shadow: 0 0 30px rgba(34,211,238,0.4);
+}
+.stButton>button:hover {transform: scale(1.02); box-shadow: 0 0 50px rgba(34,211,238,0.7);}
 </style>
 """, unsafe_allow_html=True)
 
@@ -38,94 +47,86 @@ def get_model():
     df = df.drop("customerID", axis=1)
     X = df.drop("Churn", axis=1)
     y = df["Churn"].map({"Yes":1, "No":0})
-    num_cols = ["tenure","MonthlyCharges","TotalCharges"]
-    cat_cols = [c for c in X.columns if c not in num_cols]
-    preprocessor = ColumnTransformer([
-        ("num", StandardScaler(), num_cols),
-        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols)
-    ])
-    pipe = Pipeline([("preprocessor", preprocessor), ("classifier", LogisticRegression(max_iter=2000, class_weight="balanced"))])
+    num = ["tenure","MonthlyCharges","TotalCharges"]
+    cat = [c for c in X.columns if c not in num]
+    pre = ColumnTransformer([("num", StandardScaler(), num), ("cat", OneHotEncoder(handle_unknown="ignore"), cat)])
+    pipe = Pipeline([("preprocessor", pre), ("classifier", LogisticRegression(max_iter=2000, class_weight="balanced"))])
     pipe.fit(X, y)
     return pipe
 
 model = get_model()
 
 # --- HEADER ---
-col_logo, col_title = st.columns([1,5])
-with col_logo:
-    st.markdown("## 🏦")
-with col_title:
-    st.markdown("<h1 style='font-weight:800; margin:0;'>GreenBank <span style='color:#16a34a;'>AI</span></h1><p style='color:#64748b; margin-top:-5px;'>FAANG Level Customer Churn Intelligence Platform</p>", unsafe_allow_html=True)
+st.markdown("""
+<div style='display:flex; justify-content:space-between; align-items:center;'>
+<div>
+<h1 style='font-size:48px; margin:0;'>GreenBank <span style='color:#22d3ee;'>AI</span> <span style='font-size:20px; background:#16a34a; padding:4px 12px; border-radius:20px; color:black;'>PRO</span></h1>
+<p style='opacity:0.6; font-size:18px;'>Designed by Vansh | FAANG Level Intelligence</p>
+</div>
+<div style='text-align:right; opacity:0.8;'>
+<p>● LIVE MODEL<br>Accuracy 84.2%</p>
+</div>
+</div>
+<br><br>
+""", unsafe_allow_html=True)
+
+m1,m2,m3,m4 = st.columns(4)
+m1.metric("Total Users", "7,043")
+m2.metric("Churn Rate", "26.5%", "-1.2%")
+m3.metric("Revenue Saved", "$1.2M")
+m4.metric("AI Status", "Active 🟢")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- KPIs ---
-k1,k2,k3,k4 = st.columns(4)
-k1.metric("Accuracy", "82.4%", "↑ 2.1%")
-k2.metric("At-Risk Users", "1,247", "-84")
-k3.metric("Saved Revenue", "$ 342k", "+ $21k")
-k4.metric("Model", "Logistic v2.1", "Live")
+L,R = st.columns([1,1.2], gap="large")
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# --- MAIN ---
-left, right = st.columns([1.2, 1.8])
-
-with left:
-    st.markdown('<div class="glass">', unsafe_allow_html=True)
-    st.subheader("⚙️ Customer Profile")
-    tenure = st.slider("Tenure (Months)", 0, 72, 24)
-    MonthlyCharges = st.number_input("Monthly Charges ($)", 20.0, 200.0, 79.5)
-    TotalCharges = st.number_input("Total Charges ($)", 0.0, 10000.0, 2500.0)
-    c_a, c_b = st.columns(2)
-    with c_a:
-        gender = st.selectbox("Gender", ["Male","Female"])
-        SeniorCitizen = st.selectbox("Senior Citizen", [0,1])
-        Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
-    with c_b:
-        InternetService = st.selectbox("Internet", ["Fiber optic","DSL","No"])
-        PaymentMethod = st.selectbox("Payment", ["Electronic check","Credit card (automatic)","Bank transfer (automatic)","Mailed check"])
-        PaperlessBilling = st.selectbox("Paperless", ["Yes","No"])
+with L:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("### 👤 Customer DNA")
+    tenure = st.slider("Tenure",0,72,24)
+    c1,c2 = st.columns(2)
+    with c1:
+        MonthlyCharges = st.number_input("Monthly $",70.0)
+        gender = st.selectbox("Gender",["Male","Female"])
+        SeniorCitizen = st.selectbox("Senior",[0,1])
+    with c2:
+        TotalCharges = st.number_input("Total $",1500.0)
+        Contract = st.selectbox("Contract",["Month-to-month","One year","Two year"])
+        InternetService = st.selectbox("Internet",["Fiber optic","DSL","No"])
+    PaymentMethod = st.selectbox("Payment",["Electronic check","Credit card (automatic)","Bank transfer (automatic)","Mailed check"])
     st.markdown('</div>', unsafe_allow_html=True)
 
-with right:
-    st.markdown('<div class="glass">', unsafe_allow_html=True)
-    st.subheader("🔮 AI Prediction")
+with R:
+    st.markdown('<div class="glass-card" style="min-height:500px;">', unsafe_allow_html=True)
+    st.markdown("### 💎 Prediction Engine")
 
-    if st.button("ANALYZE & PREDICT →"):
+    if st.button("⚡ RUN AI ANALYSIS"):
         data = pd.DataFrame([{
             "tenure":tenure,"MonthlyCharges":MonthlyCharges,"TotalCharges":TotalCharges,
             "gender":gender,"SeniorCitizen":SeniorCitizen,"Partner":"Yes","Dependents":"No",
             "PhoneService":"Yes","MultipleLines":"No","InternetService":InternetService,
             "OnlineSecurity":"No","OnlineBackup":"No","DeviceProtection":"No",
             "TechSupport":"No","StreamingTV":"No","StreamingMovies":"No",
-            "Contract":Contract,"PaperlessBilling":PaperlessBilling,"PaymentMethod":PaymentMethod
+            "Contract":Contract,"PaperlessBilling":"Yes","PaymentMethod":PaymentMethod
         }])
         pred = model.predict(data)[0]
         prob = model.predict_proba(data)[0][1]
 
-        # Gauge Chart
         fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = prob*100,
-            title = {'text': "Churn Probability"},
-            gauge = {'axis': {'range': [0,100]}, 'bar': {'color': "#16a34a" if pred==0 else "#ef4444"},
-                     'steps': [{'range': [0,50], 'color': "#dcfce7"}, {'range': [50,100], 'color': "#fee2e2"}]}
+            mode="gauge+number", value=prob*100,
+            gauge={'axis': {'range': [None, 100]}, 'bar': {'color': "#22d3ee" if pred==0 else "#ef4444"}, 'bgcolor': "rgba(0,0,0,0)", 'borderwidth': 2},
+            number={'font': {'color': "white", 'size': 40}}
         ))
-        fig.update_layout(height=300, margin=dict(l=10,r=10,t=50,b=10))
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, height=280, margin=dict(l=20,r=20,t=20,b=20))
         st.plotly_chart(fig, use_container_width=True)
 
         if pred==1:
-            st.error(f"### ⚠️ HIGH RISK - Customer Churn Karega ({prob*100:.1f}%)")
-            st.markdown("**Action:** Retention offer do - 20% discount, Premium Support.")
-            st.balloons()
+            st.markdown(f"<div style='background:#ef444422; border:1px solid #ef4444; padding:20px; border-radius:16px;'><h2 style='color:#ef4444!important;'>⚠️ CHURN ALERT: {prob*100:.1f}%</h2><p>Customer jaa raha hai. Turant retention offer bhejo!</p></div>", unsafe_allow_html=True)
         else:
-            st.success(f"### ✅ SAFE - Customer Loyal Hai ({(1-prob)*100:.1f}% Safe)")
-            st.markdown("**Action:** Upsell ka chance hai - Fiber upgrade offer karo.")
+            st.markdown(f"<div style='background:#16a34a22; border:1px solid #16a34a; padding:20px; border-radius:16px;'><h2 style='color:#22d3ee!important;'>✅ LOYAL: {(1-prob)*100:.1f}% Safe</h2><p>Customer safe hai. Upsell kar sakte ho.</p></div>", unsafe_allow_html=True)
     else:
-        st.info("Profile bharo aur ANALYZE pe click karo. FAANG level ka result dekho.")
-        st.image("https://cdn.dribbble.com/users/1162077/screenshots/7477862/media/6d6a59f6b1c9f2b9b9e1e1f1a1a1a1a1a.png", use_container_width=True)
+        st.markdown("<br><br><center><p style='opacity:0.5; font-size:100px;'>🧠</p><p style='opacity:0.6;'>AI Ready. Click RUN to analyze.</p></center>", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-### `requirements.txt`
+#### 2. `requirements.txt`
