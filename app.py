@@ -6,35 +6,29 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-st.set_page_config(page_title="GreenBank AI - Premium", page_icon="💎", layout="wide")
+st.set_page_config(page_title="Google Churn AI", page_icon="G", layout="wide")
 
-# --- ULTRA PREMIUM CSS ---
+# --- GOOGLE CSS ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
-.stApp {
-    background: #0a0a0a;
-    background-image: radial-gradient(circle at 20% 30%, #16a34a22 0%, transparent 50%),
-                      radial-gradient(circle at 80% 70%, #0ea5e922 0%, transparent 50%);
-}
-h1, h2, h3, p, span {font-family: 'Space Grotesk', sans-serif!important; color: white!important;}
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+.stApp {background: #ffffff;}
+h1,h2,h3 {font-family: 'Google Sans', sans-serif!important; color: #202124!important; font-weight: 500!important;}
+p, label {font-family: 'Roboto', sans-serif!important; color: #5f6368!important;}
 [data-testid="stMetric"] {
-    background: rgba(255,255,255,0.06); backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px;
+    background: white; border: 1px solid #dadce0; border-radius: 12px; padding: 16px;
 }
-.glass-card {
-    background: rgba(255,255,255,0.07); backdrop-filter: blur(25px);
-    border-radius: 24px; padding: 28px; border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+[data-testid="stMetricValue"] {color: #202124!important; font-family: 'Google Sans'!important;}
+.google-card {
+    background: white; border: 1px solid #dadce0; border-radius: 16px; padding: 24px;
 }
-.stSlider > div > div {background: #16a34a!important;}
 .stButton>button {
-    background: linear-gradient(100deg, #16a34a, #22d3ee);
-    color: black!important; font-weight: 800!important; font-size: 20px!important;
-    height: 65px; border-radius: 16px; border: none;
-    box-shadow: 0 0 30px rgba(34,211,238,0.4);
+    background: #1a73e8; color: white!important; border-radius: 24px; height: 48px;
+    font-family: 'Google Sans'!important; font-weight: 500!important; font-size: 16px!important;
+    border: none; padding: 0 32px;
 }
-.stButton>button:hover {transform: scale(1.02); box-shadow: 0 0 50px rgba(34,211,238,0.7);}
+.stButton>button:hover {background: #1765cc; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
+div[data-baseweb="select"] > div {border-radius: 8px!important; border-color: #dadce0!important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -56,51 +50,50 @@ def get_model():
 
 model = get_model()
 
-# --- HEADER ---
+# --- GOOGLE HEADER ---
 st.markdown("""
-<div style='display:flex; justify-content:space-between; align-items:center;'>
-<div>
-<h1 style='font-size:48px; margin:0;'>GreenBank <span style='color:#22d3ee;'>AI</span> <span style='font-size:20px; background:#16a34a; padding:4px 12px; border-radius:20px; color:black;'>PRO</span></h1>
-<p style='opacity:0.6; font-size:18px;'>Designed by Vansh | FAANG Level Intelligence</p>
+<div style='display:flex; align-items:center; gap:12px; padding: 12px 0; border-bottom: 1px solid #dadce0;'>
+<span style='font-size:24px; font-weight:500; font-family:Google Sans; color:#5f6368;'>Google</span>
+<span style='font-size:22px; font-family:Google Sans; color:#202124;'>Cloud</span>
+<span style='margin-left:16px; font-size:22px; color:#dadce0;'>|</span>
+<span style='margin-left:16px; font-size:22px; font-family:Google Sans; color:#202124;'>Churn Intelligence</span>
+<span style='background:#e8f0fe; color:#1967d2; padding:4px 10px; border-radius:12px; font-size:12px; margin-left:12px;'>PRO</span>
 </div>
-<div style='text-align:right; opacity:0.8;'>
-<p>● LIVE MODEL<br>Accuracy 84.2%</p>
-</div>
-</div>
-<br><br>
+<br>
 """, unsafe_allow_html=True)
 
-m1,m2,m3,m4 = st.columns(4)
-m1.metric("Total Users", "7,043")
-m2.metric("Churn Rate", "26.5%", "-1.2%")
-m3.metric("Revenue Saved", "$1.2M")
-m4.metric("AI Status", "Active 🟢")
+c1,c2,c3,c4 = st.columns(4)
+c1.metric("Active Users", "7,043", "2.1%")
+c2.metric("Churn Rate", "26.5%", "-1.2%", delta_color="inverse")
+c3.metric("Model Accuracy", "84.2%", "0.8%")
+c4.metric("Status", "● Live", "Updated")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-L,R = st.columns([1,1.2], gap="large")
+left, right = st.columns([1, 1.2], gap="large")
 
-with L:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("### 👤 Customer DNA")
-    tenure = st.slider("Tenure",0,72,24)
-    c1,c2 = st.columns(2)
-    with c1:
-        MonthlyCharges = st.number_input("Monthly $",70.0)
-        gender = st.selectbox("Gender",["Male","Female"])
-        SeniorCitizen = st.selectbox("Senior",[0,1])
-    with c2:
-        TotalCharges = st.number_input("Total $",1500.0)
-        Contract = st.selectbox("Contract",["Month-to-month","One year","Two year"])
-        InternetService = st.selectbox("Internet",["Fiber optic","DSL","No"])
-    PaymentMethod = st.selectbox("Payment",["Electronic check","Credit card (automatic)","Bank transfer (automatic)","Mailed check"])
+with left:
+    st.markdown('<div class="google-card">', unsafe_allow_html=True)
+    st.markdown("#### Enter customer details")
+    st.caption("AI will predict churn probability")
+    tenure = st.slider("Tenure (months)", 0, 72, 24)
+    col1, col2 = st.columns(2)
+    with col1:
+        MonthlyCharges = st.number_input("Monthly charges", 70.0)
+        gender = st.selectbox("Gender", ["Male","Female"])
+        SeniorCitizen = st.selectbox("Senior Citizen", [0,1])
+    with col2:
+        TotalCharges = st.number_input("Total charges", 1500.0)
+        Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
+        InternetService = st.selectbox("Internet", ["Fiber optic","DSL","No"])
+    PaymentMethod = st.selectbox("Payment method", ["Electronic check","Credit card (automatic)","Bank transfer (automatic)","Mailed check"])
     st.markdown('</div>', unsafe_allow_html=True)
 
-with R:
-    st.markdown('<div class="glass-card" style="min-height:500px;">', unsafe_allow_html=True)
-    st.markdown("### 💎 Prediction Engine")
+with right:
+    st.markdown('<div class="google-card">', unsafe_allow_html=True)
+    st.markdown("#### Prediction")
 
-    if st.button("⚡ RUN AI ANALYSIS"):
+    if st.button("Run prediction"):
         data = pd.DataFrame([{
             "tenure":tenure,"MonthlyCharges":MonthlyCharges,"TotalCharges":TotalCharges,
             "gender":gender,"SeniorCitizen":SeniorCitizen,"Partner":"Yes","Dependents":"No",
@@ -112,21 +105,34 @@ with R:
         pred = model.predict(data)[0]
         prob = model.predict_proba(data)[0][1]
 
+        # Google Colors Gauge
+        color = "#ea4335" if pred==1 else "#34a853"
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=prob*100,
-            gauge={'axis': {'range': [None, 100]}, 'bar': {'color': "#22d3ee" if pred==0 else "#ef4444"}, 'bgcolor': "rgba(0,0,0,0)", 'borderwidth': 2},
-            number={'font': {'color': "white", 'size': 40}}
+            title={'text': "Churn risk", 'font': {'family': "Google Sans", 'size': 16, 'color': "#5f6368"}},
+            gauge={'axis': {'range': [0,100]}, 'bar': {'color': color}, 'bgcolor': "#f8f9fa", 'borderwidth': 0},
+            number={'font': {'family': "Google Sans", 'color': "#202124"}}
         ))
-        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, height=280, margin=dict(l=20,r=20,t=20,b=20))
+        fig.update_layout(height=280, margin=dict(l=20,r=20,t=40,b=20), paper_bgcolor="white")
         st.plotly_chart(fig, use_container_width=True)
 
         if pred==1:
-            st.markdown(f"<div style='background:#ef444422; border:1px solid #ef4444; padding:20px; border-radius:16px;'><h2 style='color:#ef4444!important;'>⚠️ CHURN ALERT: {prob*100:.1f}%</h2><p>Customer jaa raha hai. Turant retention offer bhejo!</p></div>", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style='background:#fce8e6; border-radius:12px; padding:16px; display:flex; gap:12px;'>
+            <span style='font-size:24px;'>⚠️</span>
+            <div><b style='color:#c5221f;'>High churn risk: {prob*100:.1f}%</b><br><span style='color:#5f6368;'>Customer likely to leave. Offer retention discount.</span></div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            st.markdown(f"<div style='background:#16a34a22; border:1px solid #16a34a; padding:20px; border-radius:16px;'><h2 style='color:#22d3ee!important;'>✅ LOYAL: {(1-prob)*100:.1f}% Safe</h2><p>Customer safe hai. Upsell kar sakte ho.</p></div>", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style='background:#e6f4ea; border-radius:12px; padding:16px; display:flex; gap:12px;'>
+            <span style='font-size:24px;'>✅</span>
+            <div><b style='color:#137333;'>Low risk: {(1-prob)*100:.1f}% safe</b><br><span style='color:#5f6368;'>Customer is loyal. Try upselling.</span></div>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.markdown("<br><br><center><p style='opacity:0.5; font-size:100px;'>🧠</p><p style='opacity:0.6;'>AI Ready. Click RUN to analyze.</p></center>", unsafe_allow_html=True)
+        st.markdown("<br><br><center><div style='width:80px;height:80px;background:#f1f3f4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;'>🧠</div><br><p>Ready to analyze</p></center>", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-#### 2. `requirements.txt`
+st.markdown("<br><center><p style='font-size:12px; color:#80868b;'>Built with Google Cloud Design • By Vansh</p></center>", unsafe_allow_html=True)
