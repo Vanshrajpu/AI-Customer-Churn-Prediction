@@ -6,18 +6,34 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-st.set_page_config(page_title="GreenBank AI PRO", page_icon="🏦", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="GreenBank - Retention Intelligence", layout="wide")
 
+# --- CLEAN ENTERPRISE CSS ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-.stApp {background: radial-gradient(1000px at 10% -10%, #1e293b 0%, #020617 100%);}
-[data-testid="stSidebar"] {background: #0f172a; border-right: 1px solid #1e293b;}
-.card-pro {background: linear-gradient(180deg, #111827 0%, #0f172a 100%); border:1px solid #1e293b; border-radius:20px; padding:24px;}
-.kpi {background:#0f172a; border-radius:16px; padding:12px; border:1px solid #1e293b; text-align:center;}
-.kpi h2 {margin:0; color:white; font-weight:800; font-size:18px;}
-.kpi p {margin:0; color:#64748b; font-size:10px; letter-spacing:1px; text-transform:uppercase;}
-.stButton>button {background:#fff; color:#000!important; font-weight:800!important; height:56px; border-radius:12px; width:100%;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+html, body, [class*="css"] {font-family: 'Inter', sans-serif;}
+.stApp {background: #F8FAFC;}
+[data-testid="stSidebar"] {background: #FFFFFF; border-right: 1px solid #E2E8F0;}
+.card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.kpi {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+}
+.stButton>button {
+    background: #0F172A; color: #fff!important; border-radius: 10px;
+    height: 50px; font-weight: 600!important; border: 0; width: 100%;
+}
+.stButton>button:hover {background: #1E293B;}
+.badge {background: #F1F5F9; color: #0F172A; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; border: 1px solid #E2E8F0;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -39,66 +55,65 @@ def get_model():
 
 model = get_model()
 
-# --- SIDEBAR - 19 INPUTS ---
+# --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("## 🏦 GreenBank")
-    st.markdown("<p style='color:#facc15; font-size:11px; letter-spacing:2px; font-weight:700; margin-top:-15px;'>19 FEATURES • ENTERPRISE</p>", unsafe_allow_html=True)
+    st.markdown("### 🏦 GreenBank")
+    st.caption("Retention Intelligence Platform")
     st.divider()
 
-    st.markdown("**👤 Personal**")
-    gender = st.selectbox("Gender", ["Male","Female"])
-    SeniorCitizen = st.selectbox("Senior Citizen", ["No","Yes"])
-    Partner = st.selectbox("Partner", ["Yes","No"])
-    Dependents = st.selectbox("Dependents", ["No","Yes"])
+    tab1, tab2 = st.tabs(["Personal", "Services & Billing"])
+    with tab1:
+        gender = st.selectbox("Gender", ["Male","Female"])
+        SeniorCitizen = st.selectbox("Senior Citizen", ["No","Yes"])
+        Partner = st.selectbox("Partner", ["Yes","No"])
+        Dependents = st.selectbox("Dependents", ["No","Yes"])
+        tenure = st.slider("Tenure (Months)", 0, 72, 18)
+        MonthlyCharges = st.slider("Monthly Charges", 18, 120, 70)
+        TotalCharges = st.slider("Total Charges", 0, 9000, 1500)
+    with tab2:
+        PhoneService = st.selectbox("Phone Service", ["Yes","No"])
+        MultipleLines = st.selectbox("Multiple Lines", ["No","Yes","No phone service"])
+        InternetService = st.selectbox("Internet Service", ["Fiber optic","DSL","No"])
+        OnlineSecurity = st.selectbox("Online Security", ["No","Yes","No internet service"])
+        OnlineBackup = st.selectbox("Online Backup", ["No","Yes","No internet service"])
+        DeviceProtection = st.selectbox("Device Protection", ["No","Yes","No internet service"])
+        TechSupport = st.selectbox("Tech Support", ["No","Yes","No internet service"])
+        StreamingTV = st.selectbox("Streaming TV", ["No","Yes","No internet service"])
+        StreamingMovies = st.selectbox("Streaming Movies", ["No","Yes","No internet service"])
+        Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
+        PaperlessBilling = st.selectbox("Paperless Billing", ["Yes","No"])
+        PaymentMethod = st.selectbox("Payment Method", ["Electronic check","Mailed check","Bank transfer (automatic)","Credit card (automatic)"])
 
-    st.markdown("**📞 Services**")
-    PhoneService = st.selectbox("Phone Service", ["Yes","No"])
-    MultipleLines = st.selectbox("Multiple Lines", ["No","Yes","No phone service"])
-    InternetService = st.selectbox("Internet", ["Fiber optic","DSL","No"])
-    OnlineSecurity = st.selectbox("Online Security", ["No","Yes","No internet service"])
-    OnlineBackup = st.selectbox("Online Backup", ["No","Yes","No internet service"])
-    DeviceProtection = st.selectbox("Device Protection", ["No","Yes","No internet service"])
-    TechSupport = st.selectbox("Tech Support", ["No","Yes","No internet service"])
-    StreamingTV = st.selectbox("Streaming TV", ["No","Yes","No internet service"])
-    StreamingMovies = st.selectbox("Streaming Movies", ["No","Yes","No internet service"])
-
-    st.markdown("**💳 Billing**")
-    Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
-    PaperlessBilling = st.selectbox("Paperless Billing", ["Yes","No"])
-    PaymentMethod = st.selectbox("Payment Method", ["Electronic check","Mailed check","Bank transfer (automatic)","Credit card (automatic)"])
-    tenure = st.slider("Tenure (Months)", 0, 72, 18)
-    MonthlyCharges = st.slider("Monthly Charges $", 18, 120, 70)
-    TotalCharges = st.slider("Total Charges $", 0, 9000, 1500)
-
-    st.divider()
-    st.caption("19 inputs ready • Model trained")
-
-# --- MAIN HEADER ---
+# --- HEADER ---
 st.markdown("""
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
 <div>
-<h1 style="margin:0; font-size:34px; font-weight:800; letter-spacing:-1px;">Customer Retention Intelligence</h1>
-<p style="color:#94a3b8; margin:4px 0 0 0;">19 features • Real-time inference • Production ready</p>
+<h1 style="font-size: 28px; margin: 0; color: #0F172A;">Customer Churn Prediction</h1>
+<p style="color: #64748B; margin: 4px 0 0 0;">19 features • Production pipeline • Explainable AI</p>
 </div>
-<div style="background:#22c55e20; border:1px solid #22c55e40; padding:8px 14px; border-radius:99px; color:#22c55e; font-size:12px; font-weight:600;">● LIVE • 19 FEATURES</div>
+<div style="display:flex; gap:8px;">
+<span class="badge">19 FEATURES</span>
+<span class="badge">LOGISTIC REGRESSION</span>
+</div>
 </div>
 """, unsafe_allow_html=True)
 
+# KPIs
 k1,k2,k3,k4 = st.columns(4)
-k1.markdown(f'<div class="kpi"><p>TENURE</p><h2>{tenure}M</h2></div>', unsafe_allow_html=True)
-k2.markdown(f'<div class="kpi"><p>MONTHLY</p><h2>${MonthlyCharges}</h2></div>', unsafe_allow_html=True)
-k3.markdown(f'<div class="kpi"><p>TOTAL</p><h2>${TotalCharges}</h2></div>', unsafe_allow_html=True)
-k4.markdown(f'<div class="kpi"><p>CONTRACT</p><h2>{Contract.split("-")[0]}</h2></div>', unsafe_allow_html=True)
+k1.markdown(f'<div class="kpi"><p style="margin:0; color:#64748B; font-size:11px; font-weight:600;">TENURE</p><h3 style="margin:4px 0 0 0;">{tenure} months</h3></div>', unsafe_allow_html=True)
+k2.markdown(f'<div class="kpi"><p style="margin:0; color:#64748B; font-size:11px; font-weight:600;">MRR</p><h3 style="margin:4px 0 0 0;">${MonthlyCharges}</h3></div>', unsafe_allow_html=True)
+k3.markdown(f'<div class="kpi"><p style="margin:0; color:#64748B; font-size:11px; font-weight:600;">LTV</p><h3 style="margin:4px 0 0 0;">${TotalCharges}</h3></div>', unsafe_allow_html=True)
+k4.markdown(f'<div class="kpi"><p style="margin:0; color:#64748B; font-size:11px; font-weight:600;">CONTRACT</p><h3 style="margin:4px 0 0 0;">{Contract}</h3></div>', unsafe_allow_html=True)
 
 st.write("")
 
-left, right = st.columns([1, 1])
+left, right = st.columns([1.2, 0.8], gap="large")
 
 with left:
-    st.markdown('<div class="card-pro">', unsafe_allow_html=True)
-    st.markdown("#### AI Prediction")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown("#### Prediction Result")
 
-    if st.button("▶ RUN AI ANALYSIS (19 Features)"):
+    if st.button("Run Prediction"):
         df_input = pd.DataFrame([{
             "gender":gender,"SeniorCitizen":1 if SeniorCitizen=="Yes" else 0,"Partner":Partner,"Dependents":Dependents,
             "tenure":tenure,"PhoneService":PhoneService,"MultipleLines":MultipleLines,"InternetService":InternetService,
@@ -107,73 +122,66 @@ with left:
             "Contract":Contract,"PaperlessBilling":PaperlessBilling,"PaymentMethod":PaymentMethod,
             "MonthlyCharges":MonthlyCharges,"TotalCharges":TotalCharges
         }])
-        prob = model.predict_proba(df_input)[0][1]
-        pred = model.predict(df_input)[0]
-        st.session_state['prob'] = prob
-        st.session_state['pred'] = pred
+        st.session_state['prob'] = model.predict_proba(df_input)[0][1]
+        st.session_state['pred'] = model.predict(df_input)[0]
 
-    prob = st.session_state.get('prob', 0.35)
-    pred = st.session_state.get('pred', 0)
+    prob = st.session_state.get('prob', 0.32)
 
     fig = go.Figure(go.Indicator(
-        mode="gauge+number", value=prob*100,
-        number={'suffix':"%", 'font':{'size':36, 'color':"white"}},
+        mode="gauge+number",
+        value=prob*100,
+        number={'suffix':"%", 'font':{'size':36, 'color':"#0F172A"}},
+        title={'text':"Churn Probability", 'font':{'size':14, 'color':"#64748B"}},
         gauge={
             'axis': {'range': [0, 100]},
-            'bar': {'color': "white"},
-            'bgcolor': "#020617",
-            'steps': [{'range':[0,40],'color':"#052e16"},{'range':[40,75],'color':"#422006"},{'range':[75,100],'color':"#450a0a"}]
+            'bar': {'color': "#0F172A"},
+            'bgcolor': "#F1F5F9",
+            'steps': [
+                {'range': [0, 40], 'color': "#DCFCE7"},
+                {'range': [40, 70], 'color': "#FEF9C3"},
+                {'range': [70, 100], 'color': "#FEE2E2"}
+            ]
         }
     ))
-    fig.update_layout(height=320, paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10,r=10,t=20,b=10))
+    fig.update_layout(height=300, paper_bgcolor="white", margin=dict(l=20,r=20,t=40,b=20))
     st.plotly_chart(fig, use_container_width=True)
 
     if 'prob' in st.session_state:
-        if pred==1:
-            st.error(f"HIGH RISK - Churn Probability {prob*100:.1f}%")
-            st.markdown("**Recommended Action:** Offer retention discount and switch to yearly contract.")
+        p = st.session_state['prob']
+        if st.session_state['pred']==1:
+            st.error(f"High churn risk: {p:.1%} probability. Action: Initiate retention workflow.")
         else:
-            st.success(f"LOW RISK - Loyalty {(1-prob)*100:.1f}%")
-            st.markdown("**Recommended Action:** Customer stable, consider upsell opportunity.")
+            st.success(f"Low churn risk: {(1-p):.1%} retention probability. Action: Eligible for upsell.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    st.markdown('<div class="card-pro">', unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown("#### Risk Analysis")
 
-    # 1. BUSINESS IMPACT
-    st.markdown("#### Business Impact Analysis")
+    prob_val = st.session_state.get('prob', 0.32)
     annual_loss = MonthlyCharges * 12
-    c1, c2 = st.columns(2)
-    with c1:
-        st.metric("Potential Annual Loss", f"${annual_loss:.0f}", delta=f"-${annual_loss:.0f} if churned", delta_color="inverse")
-    with c2:
-        st.metric("Customer Lifetime Value", f"${TotalCharges}", delta=f"{tenure} months tenure")
+
+    st.metric("Potential Revenue at Risk (Annual)", f"${annual_loss:.0f}")
+    st.metric("Current Customer Value", f"${TotalCharges}")
 
     st.divider()
-
-    # 2. KEY RISK FACTORS
-    st.markdown("#### Key Risk Factors")
+    st.markdown("**Key Risk Drivers**")
     risks = []
-    if Contract == "Month-to-month": risks.append("• Month-to-month contract: 42% higher churn rate")
-    if InternetService == "Fiber optic": risks.append("• Fiber optic: High service expectations")
-    if tenure < 12: risks.append(f"• Low tenure ({tenure}M): New customers churn 3x more")
-    if TechSupport == "No": risks.append("• No Tech Support: 60% higher churn risk")
-    if PaymentMethod == "Electronic check": risks.append("• Electronic check: Highest churn payment method")
+    if Contract == "Month-to-month": risks.append("Month-to-month contract")
+    if tenure < 12: risks.append(f"Low tenure ({tenure} months)")
+    if TechSupport == "No": risks.append("No tech support")
+    if OnlineSecurity == "No": risks.append("No online security")
+    if PaymentMethod == "Electronic check": risks.append("Electronic check payment")
 
-    if not risks:
-        st.success("No major risk factors detected.")
+    if risks:
+        for r in risks:
+            st.markdown(f"- {r}")
     else:
-        for r in risks[:4]:
-            st.markdown(f"<p style='color:#fbbf24; font-size:13px; margin:4px 0;'>{r}</p>", unsafe_allow_html=True)
+        st.markdown("No critical risk factors identified.")
 
     st.divider()
-
-    # 3. FEATURE SUMMARY
-    st.markdown("#### Feature Summary (19)")
-    summary = {
-        "Feature": ["gender","SeniorCitizen","Partner","Dependents","tenure","PhoneService","MultipleLines","InternetService","OnlineSecurity","OnlineBackup","DeviceProtection","TechSupport","StreamingTV","StreamingMovies","Contract","PaperlessBilling","PaymentMethod","MonthlyCharges","TotalCharges"],
-        "Value": [gender, SeniorCitizen, Partner, Dependents, tenure, PhoneService, MultipleLines, InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges]
-    }
-    st.dataframe(pd.DataFrame(summary), use_container_width=True, height=280, hide_index=True)
+    st.markdown("**All Features (19)**")
+    st.caption(f"Gender: {gender}, Senior: {SeniorCitizen}, Partner: {Partner}, Dependents: {Dependents}, Contract: {Contract}")
+    st.caption(f"Internet: {InternetService}, Phone: {PhoneService}, Tenure: {tenure}M, Charges: ${MonthlyCharges}/${TotalCharges}")
 
     st.markdown('</div>', unsafe_allow_html=True)
