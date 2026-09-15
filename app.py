@@ -1,7 +1,7 @@
+```python
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -14,405 +14,219 @@ from sklearn.linear_model import LogisticRegression
 # =========================================================
 
 st.set_page_config(
-    page_title="GreenBank PRO MAX",
+    page_title="GreenBank PRO",
     page_icon="🏦",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 
 # =========================================================
-# CUSTOM CSS
+# CSS
 # =========================================================
 
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
+* {
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .stApp {
-    background:
-        radial-gradient(circle at 10% 10%, rgba(0,255,170,0.08), transparent 25%),
-        radial-gradient(circle at 90% 20%, rgba(0,150,255,0.08), transparent 25%),
-        linear-gradient(135deg, #06110f, #071a18, #03100f);
-    color: white;
+    background: linear-gradient(
+        135deg,
+        #f8fafc,
+        #eef2ff,
+        #f0fdf4
+    );
 }
 
-
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #061513, #081e1b);
-    border-right: 1px solid rgba(0,255,170,0.12);
+    background: rgba(255,255,255,0.95);
+    border-right: 1px solid #e2e8f0;
 }
 
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    color: white;
-}
-
-section[data-testid="stSidebar"] label {
-    color: #c9d8d5 !important;
-    font-weight: 500;
-}
-
-
-/* ================= HERO ================= */
+/* HERO */
 
 .hero {
-    position: relative;
-    overflow: hidden;
-    padding: 42px;
-    margin-bottom: 25px;
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b,
+        #334155
+    );
 
-    border-radius: 25px;
+    border-radius: 24px;
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(8,40,35,0.95),
-            rgba(5,25,23,0.90)
-        );
+    padding: 35px;
 
-    border: 1px solid rgba(0,255,170,0.18);
+    color: white;
+
+    margin-bottom: 20px;
 
     box-shadow:
-        0 20px 60px rgba(0,0,0,0.35),
-        inset 0 0 50px rgba(0,255,170,0.025);
-}
+        0 20px 40px rgba(15,23,42,0.25);
 
-.hero:before {
-    content: "";
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    right: -100px;
-    top: -130px;
+    position: relative;
 
-    background: rgba(0,255,170,0.12);
-
-    border-radius: 50%;
-
-    filter: blur(50px);
+    overflow: hidden;
 }
 
 .hero h1 {
-    position: relative;
+    font-size: 38px;
 
-    font-size: 48px;
-    line-height: 1.08;
+    line-height: 1.1;
 
-    margin: 18px 0 12px 0;
+    margin: 12px 0;
 
     font-weight: 800;
-
-    background: linear-gradient(
-        90deg,
-        #ffffff,
-        #8fffe0
-    );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .hero p {
-    position: relative;
+    color: #cbd5e1;
 
-    color: #a9c3be;
+    font-size: 14px;
 
-    font-size: 17px;
+    max-width: 600px;
 
-    max-width: 720px;
-
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+.badge {
+    display: inline-block;
 
-    padding: 8px 14px;
+    background: rgba(34,197,94,0.15);
 
-    border-radius: 30px;
+    color: #4ade80;
 
-    background: rgba(0,255,170,0.08);
-
-    border: 1px solid rgba(0,255,170,0.20);
-
-    color: #8fffe0;
-
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.live-dot {
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    background: #00ffaa;
-
-    box-shadow: 0 0 15px #00ffaa;
-
-    animation: pulse 1.5s infinite;
-}
-
-.hero-orb {
-    position: absolute;
-
-    right: 55px;
-    bottom: 30px;
-
-    width: 100px;
-    height: 100px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    font-size: 45px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(0,255,170,0.18),
-            rgba(0,255,170,0.03)
-        );
-
-    border: 1px solid rgba(0,255,170,0.25);
-
-    box-shadow:
-        0 0 40px rgba(0,255,170,0.12);
-
-    animation: float 4s ease-in-out infinite;
-}
-
-
-/* ================= KPI CARDS ================= */
-
-.kpi-card {
-    padding: 22px;
-
-    border-radius: 18px;
-
-    background: rgba(8,31,28,0.75);
-
-    border: 1px solid rgba(255,255,255,0.07);
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.20);
-
-    transition: 0.3s;
-}
-
-.kpi-card:hover {
-    transform: translateY(-4px);
-
-    border-color: rgba(0,255,170,0.20);
-}
-
-.kpi-title {
-    color: #8ba6a0;
-    font-size: 13px;
-    margin-bottom: 8px;
-}
-
-.kpi-value {
-    font-size: 27px;
-    font-weight: 800;
-    color: white;
-}
-
-.kpi-sub {
-    color: #6d8b84;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-
-/* ================= MAIN CARDS ================= */
-
-.main-card {
-    padding: 28px;
-
-    margin-top: 20px;
+    padding: 7px 12px;
 
     border-radius: 20px;
 
-    background: rgba(7,27,24,0.75);
+    font-size: 12px;
 
-    border: 1px solid rgba(255,255,255,0.07);
-
-    box-shadow: 0 15px 40px rgba(0,0,0,0.20);
+    font-weight: 700;
 }
 
-.section-title {
-    font-size: 21px;
+/* CARDS */
+
+.card {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 22px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 8px 25px rgba(15,23,42,0.06);
+
+    margin-bottom: 18px;
+}
+
+/* KPI */
+
+.kpi {
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 20px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.05);
+}
+
+.kpi-title {
+    color: #64748b;
+
+    font-size: 11px;
 
     font-weight: 700;
 
-    color: white;
-
-    margin-bottom: 5px;
+    letter-spacing: 1px;
 }
 
-.section-subtitle {
-    color: #78938d;
+.kpi-value {
+    color: #0f172a;
 
-    font-size: 13px;
+    font-size: 25px;
 
-    margin-bottom: 20px;
+    font-weight: 800;
+
+    margin-top: 5px;
 }
 
-
-/* ================= BUTTON ================= */
+/* BUTTON */
 
 .stButton > button {
     width: 100%;
+
+    height: 52px;
 
     border: none;
 
     border-radius: 12px;
 
-    padding: 13px 20px;
-
     background: linear-gradient(
-        90deg,
-        #00c98b,
-        #00a878
+        135deg,
+        #0f172a,
+        #334155
     );
 
     color: white;
 
-    font-weight: 700;
-
-    font-size: 15px;
-
-    transition: 0.3s;
-
-    box-shadow:
-        0 8px 25px rgba(0,200,140,0.18);
+    font-weight: 800;
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 12px 30px rgba(0,255,170,0.25);
+    background: linear-gradient(
+        135deg,
+        #1e293b,
+        #475569
+    );
 }
 
+/* RESULT */
 
-/* ================= INPUTS ================= */
+.high-risk {
+    background: #fee2e2;
 
-div[data-baseweb="select"] > div {
-    background-color: #0b2420 !important;
+    border: 1px solid #fecaca;
 
-    border-color: rgba(255,255,255,0.10) !important;
+    border-radius: 15px;
 
-    border-radius: 10px !important;
+    padding: 18px;
+
+    color: #991b1b;
 }
 
-input {
-    background-color: #0b2420 !important;
-    color: white !important;
+.low-risk {
+    background: #dcfce7;
+
+    border: 1px solid #bbf7d0;
+
+    border-radius: 15px;
+
+    padding: 18px;
+
+    color: #166534;
 }
-
-
-/* ================= RESULT ================= */
-
-.result-card {
-    padding: 28px;
-
-    border-radius: 20px;
-
-    margin-top: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0,150,110,0.15),
-            rgba(8,30,27,0.80)
-        );
-
-    border: 1px solid rgba(0,255,170,0.20);
-}
-
-.result-title {
-    color: #89a9a1;
-
-    font-size: 13px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-}
-
-.result-value {
-    font-size: 38px;
-
-    font-weight: 800;
-
-    margin-top: 5px;
-}
-
-
-/* ================= ANIMATIONS ================= */
-
-@keyframes pulse {
-
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.4);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-}
-
-@keyframes float {
-
-    0% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-
-    100% {
-        transform: translateY(0px);
-    }
-
-}
-
-
-/* ================= FOOTER ================= */
 
 .footer {
     text-align: center;
 
-    color: #5f7b75;
+    color: #64748b;
 
     font-size: 12px;
 
-    padding: 30px 0 15px 0;
+    padding: 30px;
 }
 
 </style>
@@ -424,74 +238,76 @@ input {
 # =========================================================
 
 @st.cache_resource
-def get_model():
+def load_model():
 
     url = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
 
     df = pd.read_csv(url)
 
-    # Convert TotalCharges to numeric
     df["TotalCharges"] = pd.to_numeric(
         df["TotalCharges"],
         errors="coerce"
     )
 
-    # Remove missing rows
     df.dropna(inplace=True)
 
-    # Remove customer ID
-    df.drop("customerID", axis=1, inplace=True)
+    df.drop(
+        "customerID",
+        axis=1,
+        inplace=True
+    )
 
-    # Features and target
-    X = df.drop("Churn", axis=1)
+    X = df.drop(
+        "Churn",
+        axis=1
+    )
 
     y = df["Churn"].map({
         "Yes": 1,
         "No": 0
     })
 
-    # Numerical columns
-    num = [
+    numerical_columns = [
         "tenure",
         "MonthlyCharges",
         "TotalCharges"
     ]
 
-    # Categorical columns
-    cat = [
-        c for c in X.columns
-        if c not in num
+    categorical_columns = [
+        column
+        for column in X.columns
+        if column not in numerical_columns
     ]
 
-    # Preprocessor
     preprocessor = ColumnTransformer(
         transformers=[
+
             (
-                "num",
+                "numerical",
                 StandardScaler(),
-                num
+                numerical_columns
             ),
 
             (
-                "cat",
+                "categorical",
                 OneHotEncoder(
                     handle_unknown="ignore"
                 ),
-                cat
+                categorical_columns
             )
         ]
     )
 
-    # Complete pipeline
-    pipe = Pipeline(
+    pipeline = Pipeline(
         steps=[
+
             (
                 "preprocessor",
                 preprocessor
             ),
 
             (
-                "classifier",
+                "model",
                 LogisticRegression(
                     max_iter=2000,
                     class_weight="balanced"
@@ -500,778 +316,720 @@ def get_model():
         ]
     )
 
-    # Train model
-    pipe.fit(X, y)
+    pipeline.fit(
+        X,
+        y
+    )
 
-    return pipe
-
-
-model = get_model()
-
-
-# =========================================================
-# HERO SECTION
-# =========================================================
-
-st.markdown("""
-<div class="hero">
-
-    <div class="hero-badge">
-        <span class="live-dot"></span>
-        AI PREDICTION ENGINE • LIVE
-    </div>
-
-    <h1>
-        Customer Churn<br>
-        Intelligence Platform
-    </h1>
-
-    <p>
-        Predict customer churn using machine learning
-        and turn customer data into actionable
-        retention decisions.
-    </p>
-
-    <div style="
-        margin-top:18px;
-        display:flex;
-        gap:9px;
-        flex-wrap:wrap;
-    ">
-
-        <span class="hero-badge">
-            🧠 Logistic Regression
-        </span>
-
-        <span class="hero-badge">
-            ⚡ 19 Features
-        </span>
-
-        <span class="hero-badge">
-            📈 Probability Scoring
-        </span>
-
-    </div>
-
-    <div class="hero-orb">
-        🤖
-    </div>
-
-</div>
-""", unsafe_allow_html=True)
+    return pipeline
 
 
-# =========================================================
-# KPI SECTION
-# =========================================================
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-
-    st.markdown("""
-    <div class="kpi-card">
-
-        <div class="kpi-title">
-            MODEL
-        </div>
-
-        <div class="kpi-value">
-            Logistic
-        </div>
-
-        <div class="kpi-sub">
-            Regression
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-
-with col2:
-
-    st.markdown("""
-    <div class="kpi-card">
-
-        <div class="kpi-title">
-            INPUT FEATURES
-        </div>
-
-        <div class="kpi-value">
-            19
-        </div>
-
-        <div class="kpi-sub">
-            Customer attributes
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-
-with col3:
-
-    st.markdown("""
-    <div class="kpi-card">
-
-        <div class="kpi-title">
-            OUTPUT
-        </div>
-
-        <div class="kpi-value">
-            Risk %
-        </div>
-
-        <div class="kpi-sub">
-            Probability scoring
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-
-with col4:
-
-    st.markdown("""
-    <div class="kpi-card">
-
-        <div class="kpi-title">
-            PURPOSE
-        </div>
-
-        <div class="kpi-value">
-            Retention
-        </div>
-
-        <div class="kpi-sub">
-            Business intelligence
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
+model = load_model()
 
 
 # =========================================================
 # SIDEBAR
 # =========================================================
 
-st.sidebar.markdown(
-    "# 🏦 Customer Profile"
-)
+with st.sidebar:
 
-st.sidebar.markdown(
-    "Enter customer information below."
-)
+    st.markdown("## 🏦 GreenBank PRO")
+
+    st.markdown(
+        "### 👤 Customer Information"
+    )
+
+    st.divider()
+
+    gender = st.selectbox(
+        "Gender",
+        ["Male", "Female"]
+    )
+
+    SeniorCitizen = st.selectbox(
+        "Senior Citizen",
+        ["No", "Yes"]
+    )
+
+    Partner = st.selectbox(
+        "Partner",
+        ["Yes", "No"]
+    )
+
+    Dependents = st.selectbox(
+        "Dependents",
+        ["No", "Yes"]
+    )
+
+    st.markdown("### 📡 Services")
+
+    PhoneService = st.selectbox(
+        "Phone Service",
+        ["Yes", "No"]
+    )
+
+    MultipleLines = st.selectbox(
+        "Multiple Lines",
+        [
+            "No",
+            "Yes",
+            "No phone service"
+        ]
+    )
+
+    InternetService = st.selectbox(
+        "Internet Service",
+        [
+            "Fiber optic",
+            "DSL",
+            "No"
+        ]
+    )
+
+    OnlineSecurity = st.selectbox(
+        "Online Security",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    OnlineBackup = st.selectbox(
+        "Online Backup",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    DeviceProtection = st.selectbox(
+        "Device Protection",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    TechSupport = st.selectbox(
+        "Tech Support",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    StreamingTV = st.selectbox(
+        "Streaming TV",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    StreamingMovies = st.selectbox(
+        "Streaming Movies",
+        [
+            "No",
+            "Yes",
+            "No internet service"
+        ]
+    )
+
+    st.markdown("### 💳 Billing")
+
+    Contract = st.selectbox(
+        "Contract",
+        [
+            "Month-to-month",
+            "One year",
+            "Two year"
+        ]
+    )
+
+    PaperlessBilling = st.selectbox(
+        "Paperless Billing",
+        [
+            "Yes",
+            "No"
+        ]
+    )
+
+    PaymentMethod = st.selectbox(
+        "Payment Method",
+        [
+            "Electronic check",
+            "Mailed check",
+            "Bank transfer (automatic)",
+            "Credit card (automatic)"
+        ]
+    )
+
+    tenure = st.slider(
+        "Tenure (Months)",
+        0,
+        72,
+        18
+    )
+
+    MonthlyCharges = st.slider(
+        "Monthly Charges ($)",
+        18,
+        120,
+        70
+    )
+
+    TotalCharges = st.slider(
+        "Total Charges ($)",
+        0,
+        9000,
+        1500
+    )
 
 
 # =========================================================
-# CUSTOMER INFORMATION
-# =========================================================
-
-gender = st.sidebar.selectbox(
-    "Gender",
-    ["Male", "Female"]
-)
-
-SeniorCitizen = st.sidebar.selectbox(
-    "Senior Citizen",
-    [0, 1],
-    format_func=lambda x: "Yes" if x == 1 else "No"
-)
-
-Partner = st.sidebar.selectbox(
-    "Partner",
-    ["Yes", "No"]
-)
-
-Dependents = st.sidebar.selectbox(
-    "Dependents",
-    ["Yes", "No"]
-)
-
-tenure = st.sidebar.number_input(
-    "Tenure (Months)",
-    min_value=0,
-    max_value=100,
-    value=12
-)
-
-MonthlyCharges = st.sidebar.number_input(
-    "Monthly Charges",
-    min_value=0.0,
-    value=70.0,
-    step=1.0
-)
-
-TotalCharges = st.sidebar.number_input(
-    "Total Charges",
-    min_value=0.0,
-    value=800.0,
-    step=10.0
-)
-
-
-# =========================================================
-# SERVICES
-# =========================================================
-
-st.sidebar.markdown("---")
-
-st.sidebar.markdown("### 📡 Services")
-
-PhoneService = st.sidebar.selectbox(
-    "Phone Service",
-    ["Yes", "No"]
-)
-
-MultipleLines = st.sidebar.selectbox(
-    "Multiple Lines",
-    ["Yes", "No", "No phone service"]
-)
-
-InternetService = st.sidebar.selectbox(
-    "Internet Service",
-    ["DSL", "Fiber optic", "No"]
-)
-
-OnlineSecurity = st.sidebar.selectbox(
-    "Online Security",
-    ["Yes", "No", "No internet service"]
-)
-
-OnlineBackup = st.sidebar.selectbox(
-    "Online Backup",
-    ["Yes", "No", "No internet service"]
-)
-
-DeviceProtection = st.sidebar.selectbox(
-    "Device Protection",
-    ["Yes", "No", "No internet service"]
-)
-
-TechSupport = st.sidebar.selectbox(
-    "Tech Support",
-    ["Yes", "No", "No internet service"]
-)
-
-StreamingTV = st.sidebar.selectbox(
-    "Streaming TV",
-    ["Yes", "No", "No internet service"]
-)
-
-StreamingMovies = st.sidebar.selectbox(
-    "Streaming Movies",
-    ["Yes", "No", "No internet service"]
-)
-
-
-# =========================================================
-# CONTRACT INFORMATION
-# =========================================================
-
-st.sidebar.markdown("---")
-
-st.sidebar.markdown("### 📄 Contract")
-
-Contract = st.sidebar.selectbox(
-    "Contract",
-    [
-        "Month-to-month",
-        "One year",
-        "Two year"
-    ]
-)
-
-PaperlessBilling = st.sidebar.selectbox(
-    "Paperless Billing",
-    ["Yes", "No"]
-)
-
-PaymentMethod = st.sidebar.selectbox(
-    "Payment Method",
-    [
-        "Electronic check",
-        "Mailed check",
-        "Bank transfer (automatic)",
-        "Credit card (automatic)"
-    ]
-)
-
-
-# =========================================================
-# MAIN PREDICTION SECTION
+# HERO
 # =========================================================
 
 st.markdown("""
-<div class="main-card">
+<div class="hero">
 
-    <div class="section-title">
-        🔮 Customer Churn Prediction
-    </div>
+    <span class="badge">
+        🟢 LIVE AI SYSTEM
+    </span>
 
-    <div class="section-subtitle">
-        Analyze customer behavior and estimate the probability
-        that the customer will leave the service.
+    <h1>
+        Customer Retention<br>
+        Intelligence Platform
+    </h1>
+
+    <p>
+        Predict customer churn before it happens.
+        Analyze customer behavior using machine learning
+        and identify high-risk customers.
+    </p>
+
+    <div style="margin-top:18px;">
+
+        <span class="badge">
+            🤖 Logistic Regression
+        </span>
+
+        &nbsp;
+
+        <span class="badge">
+            ⚡ 19 Features
+        </span>
+
+        &nbsp;
+
+        <span class="badge">
+            📊 Probability Scoring
+        </span>
+
     </div>
 
 </div>
 """, unsafe_allow_html=True)
 
 
-predict_col, info_col = st.columns(
-    [1.5, 1]
-)
-
-
 # =========================================================
-# PREDICT BUTTON
+# KPI
 # =========================================================
 
-with predict_col:
+k1, k2, k3, k4 = st.columns(4)
 
-    st.markdown(
-        "### 🚀 Run AI Prediction"
-    )
+with k1:
 
-    st.write(
-        "Click the button to analyze the customer profile."
-    )
+    st.markdown(f"""
+    <div class="kpi">
 
-    predict = st.button(
-        "⚡ PREDICT CUSTOMER CHURN"
-    )
-
-
-# =========================================================
-# MODEL INFO
-# =========================================================
-
-with info_col:
-
-    st.markdown("""
-    <div class="main-card">
-
-        <div class="section-title">
-            🧠 Model Information
+        <div class="kpi-title">
+            TENURE
         </div>
 
-        <div class="section-subtitle">
-            Machine learning pipeline
+        <div class="kpi-value">
+            {tenure} Months
         </div>
-
-        <p>
-            <b>Algorithm:</b> Logistic Regression
-        </p>
-
-        <p>
-            <b>Preprocessing:</b> StandardScaler + OneHotEncoder
-        </p>
-
-        <p>
-            <b>Output:</b> Churn Probability
-        </p>
 
     </div>
     """, unsafe_allow_html=True)
+
+
+with k2:
+
+    st.markdown(f"""
+    <div class="kpi">
+
+        <div class="kpi-title">
+            MONTHLY CHARGES
+        </div>
+
+        <div class="kpi-value">
+            ${MonthlyCharges}
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+with k3:
+
+    st.markdown(f"""
+    <div class="kpi">
+
+        <div class="kpi-title">
+            TOTAL CHARGES
+        </div>
+
+        <div class="kpi-value">
+            ${TotalCharges}
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+with k4:
+
+    st.markdown(f"""
+    <div class="kpi">
+
+        <div class="kpi-title">
+            CONTRACT
+        </div>
+
+        <div class="kpi-value">
+            {Contract}
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+st.write("")
+
+
+# =========================================================
+# MAIN AREA
+# =========================================================
+
+left, right = st.columns(
+    [1.4, 1]
+)
 
 
 # =========================================================
 # PREDICTION
 # =========================================================
 
-if predict:
+with left:
 
-    # Create input dataframe
+    st.markdown("""
+    <div class="card">
 
-    df_input = pd.DataFrame({
+        <h3>
+            🎯 AI Prediction Engine
+        </h3>
 
-        "gender": [gender],
+        <p style="color:#64748b;">
+            19 customer features → Machine Learning Model
+            → Churn Probability
+        </p>
 
-        "SeniorCitizen": [SeniorCitizen],
+    </div>
+    """, unsafe_allow_html=True)
 
-        "Partner": [Partner],
-
-        "Dependents": [Dependents],
-
-        "tenure": [tenure],
-
-        "PhoneService": [PhoneService],
-
-        "MultipleLines": [MultipleLines],
-
-        "InternetService": [InternetService],
-
-        "OnlineSecurity": [OnlineSecurity],
-
-        "OnlineBackup": [OnlineBackup],
-
-        "DeviceProtection": [DeviceProtection],
-
-        "TechSupport": [TechSupport],
-
-        "StreamingTV": [StreamingTV],
-
-        "StreamingMovies": [StreamingMovies],
-
-        "Contract": [Contract],
-
-        "PaperlessBilling": [PaperlessBilling],
-
-        "PaymentMethod": [PaymentMethod],
-
-        "MonthlyCharges": [MonthlyCharges],
-
-        "TotalCharges": [TotalCharges]
-
-    })
+    predict_button = st.button(
+        "🚀 RUN AI ANALYSIS"
+    )
 
 
-    # Prediction probability
+    if predict_button:
 
-    probability = model.predict_proba(
-        df_input
-    )[0][1]
+        input_data = pd.DataFrame([{
 
-    prediction = model.predict(
-        df_input
-    )[0]
+            "gender": gender,
+
+            "SeniorCitizen":
+                1 if SeniorCitizen == "Yes" else 0,
+
+            "Partner": Partner,
+
+            "Dependents": Dependents,
+
+            "tenure": tenure,
+
+            "PhoneService": PhoneService,
+
+            "MultipleLines": MultipleLines,
+
+            "InternetService": InternetService,
+
+            "OnlineSecurity": OnlineSecurity,
+
+            "OnlineBackup": OnlineBackup,
+
+            "DeviceProtection": DeviceProtection,
+
+            "TechSupport": TechSupport,
+
+            "StreamingTV": StreamingTV,
+
+            "StreamingMovies": StreamingMovies,
+
+            "Contract": Contract,
+
+            "PaperlessBilling": PaperlessBilling,
+
+            "PaymentMethod": PaymentMethod,
+
+            "MonthlyCharges": MonthlyCharges,
+
+            "TotalCharges": TotalCharges
+
+        }])
 
 
-    churn_percent = probability * 100
+        probability = model.predict_proba(
+            input_data
+        )[0][1]
+
+        prediction = model.predict(
+            input_data
+        )[0]
+
+
+        st.session_state["probability"] = probability
+
+        st.session_state["prediction"] = prediction
+
+
+    # Default value
+
+    probability = st.session_state.get(
+        "probability",
+        0
+    )
+
+    prediction = st.session_state.get(
+        "prediction",
+        None
+    )
+
+
+    # =====================================================
+    # GAUGE
+    # =====================================================
+
+    fig = go.Figure(
+        go.Indicator(
+
+            mode="gauge+number",
+
+            value=probability * 100,
+
+            number={
+                "suffix": "%",
+                "font": {
+                    "size": 45,
+                    "color": "#0f172a"
+                }
+            },
+
+            title={
+                "text": "Churn Probability"
+            },
+
+            gauge={
+
+                "axis": {
+                    "range": [0, 100]
+                },
+
+                "bar": {
+                    "color": "#0f172a"
+                },
+
+                "steps": [
+
+                    {
+                        "range": [0, 35],
+                        "color": "#dcfce7"
+                    },
+
+                    {
+                        "range": [35, 70],
+                        "color": "#fef3c7"
+                    },
+
+                    {
+                        "range": [70, 100],
+                        "color": "#fee2e2"
+                    }
+
+                ]
+
+            }
+
+        )
+    )
+
+
+    fig.update_layout(
+
+        height=320,
+
+        margin=dict(
+            l=20,
+            r=20,
+            t=50,
+            b=20
+        ),
+
+        paper_bgcolor="rgba(0,0,0,0)"
+    )
+
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
 
     # =====================================================
     # RESULT
     # =====================================================
 
-    if prediction == 1:
+    if prediction is not None:
 
-        status = "HIGH CHURN RISK"
+        if prediction == 1:
 
-        message = (
-            "This customer is likely to leave the service."
-        )
+            st.markdown(f"""
+            <div class="high-risk">
 
-    else:
+                <h3>
+                    🔴 HIGH CHURN RISK
+                </h3>
 
-        status = "LOW CHURN RISK"
+                <b>
+                    Churn Probability:
+                    {probability * 100:.2f}%
+                </b>
 
-        message = (
-            "This customer is likely to stay with the service."
-        )
+                <p>
+                    Customer has a high probability
+                    of leaving the service.
+                </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+        else:
+
+            st.markdown(f"""
+            <div class="low-risk">
+
+                <h3>
+                    🟢 LOW CHURN RISK
+                </h3>
+
+                <b>
+                    Churn Probability:
+                    {probability * 100:.2f}%
+                </b>
+
+                <p>
+                    Customer is likely to remain
+                    with the service.
+                </p>
+
+            </div>
+            """, unsafe_allow_html=True)
 
 
-    st.markdown(f"""
-    <div class="result-card">
+# =========================================================
+# BUSINESS IMPACT
+# =========================================================
 
-        <div class="result-title">
-            AI Prediction Result
-        </div>
+with right:
 
-        <div class="result-value">
-            {status}
-        </div>
+    st.markdown("""
+    <div class="card">
 
-        <p style="
-            color:#a9c3be;
-            margin-top:8px;
-        ">
-            {message}
+        <h3>
+            💼 Business Impact
+        </h3>
+
+        <p style="color:#64748b;">
+            Customer financial information
         </p>
 
     </div>
     """, unsafe_allow_html=True)
 
 
-    # =====================================================
-    # PROBABILITY + GAUGE
-    # =====================================================
-
-    gauge_col, detail_col = st.columns(
-        [1, 1]
-    )
+    annual_value = MonthlyCharges * 12
 
 
-    with gauge_col:
+    c1, c2 = st.columns(2)
 
-        st.markdown(
-            "### 📊 Churn Probability"
-        )
-
-        fig = go.Figure(
-            go.Indicator(
-                mode="gauge+number",
-                value=churn_percent,
-
-                number={
-                    "suffix": "%",
-                    "font": {
-                        "size": 35
-                    }
-                },
-
-                gauge={
-                    "axis": {
-                        "range": [0, 100]
-                    },
-
-                    "bar": {
-                        "thickness": 0.75
-                    },
-
-                    "steps": [
-                        {
-                            "range": [0, 30]
-                        },
-
-                        {
-                            "range": [30, 70]
-                        },
-
-                        {
-                            "range": [70, 100]
-                        }
-                    ],
-
-                    "threshold": {
-                        "line": {
-                            "width": 4
-                        },
-
-                        "thickness": 0.8,
-
-                        "value": churn_percent
-                    }
-                }
-            )
-        )
-
-        fig.update_layout(
-            height=330,
-
-            margin=dict(
-                l=20,
-                r=20,
-                t=30,
-                b=20
-            ),
-
-            paper_bgcolor="rgba(0,0,0,0)",
-
-            font={
-                "color": "white"
-            }
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-    # =====================================================
-    # RISK ANALYSIS
-    # =====================================================
-
-    with detail_col:
-
-        st.markdown(
-            "### 🎯 Risk Analysis"
-        )
-
-        if churn_percent >= 70:
-
-            risk_level = "Critical"
-
-            recommendation = (
-                "Immediate retention action is recommended."
-            )
-
-        elif churn_percent >= 40:
-
-            risk_level = "Medium"
-
-            recommendation = (
-                "Monitor this customer and consider targeted offers."
-            )
-
-        else:
-
-            risk_level = "Low"
-
-            recommendation = (
-                "Customer appears relatively stable."
-            )
-
-
-        st.markdown(f"""
-        <div class="main-card">
-
-            <div class="kpi-title">
-                RISK LEVEL
-            </div>
-
-            <div class="kpi-value">
-                {risk_level}
-            </div>
-
-            <br>
-
-            <div class="kpi-title">
-                PROBABILITY
-            </div>
-
-            <div class="kpi-value">
-                {churn_percent:.2f}%
-            </div>
-
-            <br>
-
-            <div class="kpi-title">
-                RECOMMENDATION
-            </div>
-
-            <p style="
-                color:#b3c9c4;
-                line-height:1.6;
-            ">
-                {recommendation}
-            </p>
-
-        </div>
-        """, unsafe_allow_html=True)
-
-
-    # =====================================================
-    # CUSTOMER SUMMARY
-    # =====================================================
-
-    st.markdown(
-        "### 👤 Customer Profile Summary"
-    )
-
-    summary_col1, summary_col2, summary_col3, summary_col4 = st.columns(4)
-
-
-    with summary_col1:
+    with c1:
 
         st.metric(
-            "Tenure",
-            f"{tenure} months"
+            "Annual Revenue",
+            f"${annual_value}"
         )
 
-
-    with summary_col2:
+    with c2:
 
         st.metric(
-            "Monthly Charges",
-            f"${MonthlyCharges:.2f}"
+            "Customer LTV",
+            f"${TotalCharges}"
         )
 
-
-    with summary_col3:
-
-        st.metric(
-            "Total Charges",
-            f"${TotalCharges:.2f}"
-        )
-
-
-    with summary_col4:
-
-        st.metric(
-            "Contract",
-            Contract
-        )
-
-
-    # =====================================================
-    # BUSINESS INTELLIGENCE
-    # =====================================================
 
     st.markdown("""
-    <div class="main-card">
+    <div class="card">
 
-        <div class="section-title">
-            💼 Business Intelligence
-        </div>
-
-        <div class="section-subtitle">
-            Suggested actions based on the prediction
-        </div>
+        <h3>
+            🔍 Risk Factors
+        </h3>
 
     </div>
     """, unsafe_allow_html=True)
 
 
-    if churn_percent >= 70:
+    risks = []
 
-        actions = [
-            "🎁 Provide a personalized retention offer",
-            "📞 Contact the customer proactively",
-            "💳 Review pricing and payment experience",
-            "🛠️ Identify possible service/support issues"
-        ]
 
-    elif churn_percent >= 40:
+    if Contract == "Month-to-month":
 
-        actions = [
-            "📊 Monitor customer engagement",
-            "🎁 Consider a targeted loyalty offer",
-            "📞 Follow up with the customer",
-            "🔎 Review service usage patterns"
-        ]
+        risks.append(
+            "Month-to-month contract"
+        )
+
+
+    if tenure < 12:
+
+        risks.append(
+            "Low customer tenure"
+        )
+
+
+    if TechSupport == "No":
+
+        risks.append(
+            "No technical support"
+        )
+
+
+    if InternetService == "Fiber optic":
+
+        risks.append(
+            "Fiber optic customer"
+        )
+
+
+    if PaymentMethod == "Electronic check":
+
+        risks.append(
+            "Electronic check payment"
+        )
+
+
+    if len(risks) == 0:
+
+        st.success(
+            "No major risk factors detected."
+        )
 
     else:
 
-        actions = [
-            "⭐ Maintain current customer experience",
-            "🎁 Offer loyalty benefits",
-            "📈 Encourage additional services",
-            "🤝 Continue regular engagement"
-        ]
+        for risk in risks:
+
+            st.warning(
+                f"⚠️ {risk}"
+            )
 
 
-    action_cols = st.columns(2)
+# =========================================================
+# CUSTOMER DATA
+# =========================================================
 
-    for i, action in enumerate(actions):
+st.markdown("""
+<div class="card">
 
-        with action_cols[i % 2]:
+    <h3>
+        📋 Customer Feature Summary
+    </h3>
 
-            st.markdown(f"""
-            <div class="kpi-card" style="margin-bottom:15px;">
-
-                <div style="
-                    color:#d6e8e4;
-                    font-size:14px;
-                ">
-                    {action}
-                </div>
-
-            </div>
-            """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 
-    # =====================================================
-    # INPUT FEATURE TABLE
-    # =====================================================
+feature_data = pd.DataFrame({
 
-    st.markdown(
-        "### 📋 Prediction Input Data"
-    )
+    "Feature": [
 
-    display_df = df_input.T.reset_index()
+        "Gender",
+        "Senior Citizen",
+        "Partner",
+        "Dependents",
+        "Tenure",
+        "Phone Service",
+        "Multiple Lines",
+        "Internet Service",
+        "Online Security",
+        "Online Backup",
+        "Device Protection",
+        "Tech Support",
+        "Streaming TV",
+        "Streaming Movies",
+        "Contract",
+        "Paperless Billing",
+        "Payment Method",
+        "Monthly Charges",
+        "Total Charges"
 
-    display_df.columns = [
-        "Feature",
-        "Value"
+    ],
+
+    "Value": [
+
+        gender,
+        SeniorCitizen,
+        Partner,
+        Dependents,
+        tenure,
+        PhoneService,
+        MultipleLines,
+        InternetService,
+        OnlineSecurity,
+        OnlineBackup,
+        DeviceProtection,
+        TechSupport,
+        StreamingTV,
+        StreamingMovies,
+        Contract,
+        PaperlessBilling,
+        PaymentMethod,
+        MonthlyCharges,
+        TotalCharges
+
     ]
 
-    st.dataframe(
-        display_df,
-        use_container_width=True,
-        hide_index=True
-    )
+})
+
+
+st.dataframe(
+    feature_data,
+    use_container_width=True,
+    hide_index=True
+)
 
 
 # =========================================================
@@ -1281,13 +1039,16 @@ if predict:
 st.markdown("""
 <div class="footer">
 
-    🏦 GreenBank PRO MAX
-    &nbsp; • &nbsp;
-    AI Customer Churn Prediction
+    🏦 GreenBank PRO
 
-    <br><br>
+    <br>
+
+    AI Customer Churn Prediction System
+
+    <br>
 
     Built with Python • Pandas • Scikit-learn • Streamlit
 
 </div>
 """, unsafe_allow_html=True)
+```
