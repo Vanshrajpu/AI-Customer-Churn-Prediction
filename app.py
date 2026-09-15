@@ -8,41 +8,16 @@ from sklearn.linear_model import LogisticRegression
 
 st.set_page_config(page_title="GreenBank AI PRO", page_icon="🏦", layout="wide", initial_sidebar_state="expanded")
 
-# --- FAANG LEVEL CSS ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-* {font-family: 'Inter', sans-serif;}
-.stApp {background: radial-gradient(1200px at 20% -10%, #1e293b 0%, #0a0f1a 50%, #020617 100%);}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+.stApp {background: radial-gradient(1000px at 10% -10%, #1e293b 0%, #020617 100%);}
 [data-testid="stSidebar"] {background: #0f172a; border-right: 1px solid #1e293b;}
-.glass {
-    background: rgba(255,255,255,0.04);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 24px;
-}
-.card-pro {
-    background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
-    border: 1px solid #1e293b;
-    border-radius: 20px;
-    padding: 24px;
-}
-.kpi {background:#0f172a; border-radius:16px; padding:16px; border:1px solid #1e293b; text-align:center;}
-.kpi h2 {margin:0; color:white; font-weight:800; font-size:24px;}
-.kpi p {margin:0; color:#64748b; font-size:11px; letter-spacing:1px; text-transform:uppercase;}
-.stButton>button {
-    background: #ffffff;
-    color: #000000!important;
-    font-weight: 700!important;
-    height: 52px;
-    border-radius: 12px;
-    border: 0;
-    font-size: 15px!important;
-    box-shadow: 0 10px 30px rgba(255,255,255,0.15);
-}
-.stButton>button:hover {background:#facc15; transform: translateY(-1px);}
-div[data-baseweb="select"] > div, div[data-baseweb="slider"] {background: #0f172a!important;}
+.card-pro {background: linear-gradient(180deg, #111827 0%, #0f172a 100%); border:1px solid #1e293b; border-radius:20px; padding:24px;}
+.kpi {background:#0f172a; border-radius:16px; padding:12px; border:1px solid #1e293b; text-align:center;}
+.kpi h2 {margin:0; color:white; font-weight:800; font-size:18px;}
+.kpi p {margin:0; color:#64748b; font-size:10px; letter-spacing:1px; text-transform:uppercase;}
+.stButton>button {background:#fff; color:#000!important; font-weight:800!important; height:56px; border-radius:12px; width:100%;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -64,119 +39,112 @@ def get_model():
 
 model = get_model()
 
-# --- SIDEBAR ---
+# --- SIDEBAR - 21 INPUTS ---
 with st.sidebar:
     st.markdown("## 🏦 GreenBank")
-    st.markdown("<p style='color:#facc15; font-weight:700; letter-spacing:2px; font-size:12px; margin-top:-15px;'>AI PRO • ENTERPRISE</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#facc15; font-size:11px; letter-spacing:2px; font-weight:700; margin-top:-15px;'>19 FEATURES • ENTERPRISE</p>", unsafe_allow_html=True)
     st.divider()
-    st.markdown("### ⚙️ Customer Input")
-    tenure = st.slider("Tenure", 0, 72, 18)
-    mc = st.slider("Monthly Charges", 20, 120, 70)
-    tc = st.slider("Total Charges", 0, 10000, 1500)
-    Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
-    InternetService = st.selectbox("Internet", ["Fiber optic","DSL","No"])
-    PaymentMethod = st.selectbox("Payment", ["Electronic check","Credit card (automatic)","Bank transfer (automatic)","Mailed check"])
-    st.divider()
-    st.markdown("<p style='color:#475569; font-size:11px;'>© 2026 GreenBank AI • Built for scale • Model v2.1</p>", unsafe_allow_html=True)
 
-# --- MAIN ---
+    st.markdown("**👤 Personal**")
+    gender = st.selectbox("Gender", ["Male","Female"])
+    SeniorCitizen = st.selectbox("Senior Citizen", ["No","Yes"])
+    Partner = st.selectbox("Partner", ["Yes","No"])
+    Dependents = st.selectbox("Dependents", ["No","Yes"])
+
+    st.markdown("**📞 Services**")
+    PhoneService = st.selectbox("Phone Service", ["Yes","No"])
+    MultipleLines = st.selectbox("Multiple Lines", ["No","Yes","No phone service"])
+    InternetService = st.selectbox("Internet", ["Fiber optic","DSL","No"])
+    OnlineSecurity = st.selectbox("Online Security", ["No","Yes","No internet service"])
+    OnlineBackup = st.selectbox("Online Backup", ["No","Yes","No internet service"])
+    DeviceProtection = st.selectbox("Device Protection", ["No","Yes","No internet service"])
+    TechSupport = st.selectbox("Tech Support", ["No","Yes","No internet service"])
+    StreamingTV = st.selectbox("Streaming TV", ["No","Yes","No internet service"])
+    StreamingMovies = st.selectbox("Streaming Movies", ["No","Yes","No internet service"])
+
+    st.markdown("**💳 Billing**")
+    Contract = st.selectbox("Contract", ["Month-to-month","One year","Two year"])
+    PaperlessBilling = st.selectbox("Paperless Billing", ["Yes","No"])
+    PaymentMethod = st.selectbox("Payment Method", ["Electronic check","Mailed check","Bank transfer (automatic)","Credit card (automatic)"])
+    tenure = st.slider("Tenure (Months)", 0, 72, 18)
+    MonthlyCharges = st.slider("Monthly Charges $", 18, 120, 70)
+    TotalCharges = st.slider("Total Charges $", 0, 9000, 1500)
+
+    st.divider()
+    st.caption("19 inputs ready • Model trained")
+
+# --- MAIN HEADER ---
 st.markdown("""
-<div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:20px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
 <div>
-<h1 style="font-size:36px; font-weight:800; margin:0; letter-spacing:-1px;">Customer Retention Intelligence</h1>
-<p style="color:#94a3b8; margin:5px 0 0 0;">Predict churn before it happens. Enterprise-grade AI for banking teams.</p>
+<h1 style="margin:0; font-size:34px; font-weight:800; letter-spacing:-1px;">Customer Retention Intelligence</h1>
+<p style="color:#94a3b8; margin:4px 0 0 0;">19 features • Real-time inference • Production ready</p>
 </div>
-<div style="background:#22c55e20; border:1px solid #22c55e40; padding:8px 14px; border-radius:99px; color:#22c55e; font-size:12px; font-weight:600;">● LIVE MODEL • 81.2% ACCURACY</div>
+<div style="background:#22c55e20; border:1px solid #22c55e40; padding:8px 14px; border-radius:99px; color:#22c55e; font-size:12px; font-weight:600;">● LIVE • 19 FEATURES</div>
 </div>
 """, unsafe_allow_html=True)
 
-# KPIs
 k1,k2,k3,k4 = st.columns(4)
-k1.markdown(f'<div class="kpi"><p>Avg Tenure</p><h2>{tenure} M</h2></div>', unsafe_allow_html=True)
-k2.markdown(f'<div class="kpi"><p>MRR</p><h2>${mc}</h2></div>', unsafe_allow_html=True)
-k3.markdown(f'<div class="kpi"><p>LTV</p><h2>${tc}</h2></div>', unsafe_allow_html=True)
-k4.markdown(f'<div class="kpi"><p>Contract</p><h2 style="font-size:14px;">{Contract[:3].upper()}</h2></div>', unsafe_allow_html=True)
+k1.markdown(f'<div class="kpi"><p>TENURE</p><h2>{tenure}M</h2></div>', unsafe_allow_html=True)
+k2.markdown(f'<div class="kpi"><p>MONTHLY</p><h2>${MonthlyCharges}</h2></div>', unsafe_allow_html=True)
+k3.markdown(f'<div class="kpi"><p>TOTAL</p><h2>${TotalCharges}</h2></div>', unsafe_allow_html=True)
+k4.markdown(f'<div class="kpi"><p>CONTRACT</p><h2>{Contract.split("-")[0]}</h2></div>', unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.write("")
 
-left, right = st.columns([1, 1.1])
+left, right = st.columns([1, 1])
 
 with left:
     st.markdown('<div class="card-pro">', unsafe_allow_html=True)
-    st.markdown("#### 🎯 Prediction Console")
-    st.markdown("<p style='color:#64748b; font-size:13px; margin-top:-10px;'>Click to run real-time inference on the selected customer profile.</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("#### 🎯 AI Prediction")
 
-    if st.button("▶ RUN AI ANALYSIS"):
-        data = pd.DataFrame([{
-            "tenure":tenure,"MonthlyCharges":mc,"TotalCharges":tc,"gender":"Male","SeniorCitizen":0,
-            "Partner":"Yes","Dependents":"No","PhoneService":"Yes","MultipleLines":"No",
-            "InternetService":InternetService,"OnlineSecurity":"No","OnlineBackup":"No",
-            "DeviceProtection":"No","TechSupport":"No","StreamingTV":"No","StreamingMovies":"No",
-            "Contract":Contract,"PaperlessBilling":"Yes","PaymentMethod":PaymentMethod
+    if st.button("▶ RUN AI ANALYSIS (19 Features)"):
+        df_input = pd.DataFrame([{
+            "gender":gender,"SeniorCitizen":1 if SeniorCitizen=="Yes" else 0,"Partner":Partner,"Dependents":Dependents,
+            "tenure":tenure,"PhoneService":PhoneService,"MultipleLines":MultipleLines,"InternetService":InternetService,
+            "OnlineSecurity":OnlineSecurity,"OnlineBackup":OnlineBackup,"DeviceProtection":DeviceProtection,
+            "TechSupport":TechSupport,"StreamingTV":StreamingTV,"StreamingMovies":StreamingMovies,
+            "Contract":Contract,"PaperlessBilling":PaperlessBilling,"PaymentMethod":PaymentMethod,
+            "MonthlyCharges":MonthlyCharges,"TotalCharges":TotalCharges
         }])
-        prob = model.predict_proba(data)[0][1]
+        prob = model.predict_proba(df_input)[0][1]
+        pred = model.predict(df_input)[0]
         st.session_state['prob'] = prob
-        st.session_state['pred'] = model.predict(data)[0]
-    else:
-        prob = st.session_state.get('prob', 0.32)
+        st.session_state['pred'] = pred
 
-    # Always show gauge
+    prob = st.session_state.get('prob', 0.35)
     pred = st.session_state.get('pred', 0)
-    prob_val = st.session_state.get('prob', 0.32)
 
     fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=prob_val*100,
-        number={'suffix':"%", 'font':{'size':32, 'color':"white", 'family':"Inter"}},
+        mode="gauge+number", value=prob*100,
+        number={'suffix':"%", 'font':{'size':36, 'color':"white"}},
         gauge={
-            'axis': {'range': [0, 100], 'tickcolor': "#1e293b"},
-            'bar': {'color': "white", 'thickness':0.3},
+            'axis': {'range': [0, 100]},
+            'bar': {'color': "white"},
             'bgcolor': "#020617",
-            'borderwidth': 0,
-            'steps': [
-                {'range': [0, 40], 'color': "#052e16"},
-                {'range': [40, 75], 'color': "#422006"},
-                {'range': [75, 100], 'color': "#450a0a"}
-            ],
+            'steps': [{'range':[0,40],'color':"#052e16"},{'range':[40,75],'color':"#422006"},{'range':[75,100],'color':"#450a0a"}]
         }
     ))
-    fig.update_layout(height=320, paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10,r=10,t=30,b=10))
+    fig.update_layout(height=320, paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10,r=10,t=20,b=10))
     st.plotly_chart(fig, use_container_width=True)
 
     if 'prob' in st.session_state:
-        if st.session_state['pred']==1:
-            st.markdown(f"""
-            <div style="background:#7f1d1d; border:1px solid #ef4444; border-radius:12px; padding:14px;">
-            <b style="color:white;">🔴 HIGH CHURN RISK - {st.session_state['prob']*100:.1f}%</b><br>
-            <span style="color:#fecaca; font-size:13px;">Retention team ko alert karo. Discount / Support offer do.</span>
-            </div>
-            """, unsafe_allow_html=True)
+        if pred==1:
+            st.error(f"🔴 HIGH RISK - Churn Hoga! {prob*100:.1f}%")
+            st.markdown("**Action:** Retention offer, 1-year contract pe shift karo.")
         else:
-            st.markdown(f"""
-            <div style="background:#14532d; border:1px solid #22c55e; border-radius:12px; padding:14px;">
-            <b style="color:white;">🟢 LOW RISK - {(1-st.session_state['prob'])*100:.1f}% LOYAL</b><br>
-            <span style="color:#bbf7d0; font-size:13px;">Customer stable hai. Upsell opportunity hai.</span>
-            </div>
-            """, unsafe_allow_html=True)
+            st.success(f"🟢 LOW RISK - Safe Hai! Loyalty {(1-prob)*100:.1f}%")
+            st.markdown("**Action:** Upsell karo, customer khush hai.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    st.markdown('<div class="glass">', unsafe_allow_html=True)
-    st.markdown("#### 📊 Why FAANG loves this design?")
-    st.markdown("""
-    <div style="color:#94a3b8; font-size:14px; line-height:1.7;">
-    <b style="color:white;">1. Minimal Cognitive Load:</b> Dark theme + 1 accent color (like Stripe dashboard)<br>
-    <b style="color:white;">2. Real Metrics First:</b> KPIs upar, action niche - VP bhi samajh jayega<br>
-    <b style="color:white;">3. Enterprise Ready:</b> Sidebar controls, live badge, glassmorphism<br><br>
-    <b style="color:white;">Pro Tip for Viva:</b> Bolna "Sir, maine model ko pipeline me wrap kiya hai taki pickle ka version mismatch issue na aaye, aur UI ko design system principles pe banaya hai."
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("#### 💡 Retention Playbook")
-    c1,c2 = st.columns(2)
-    with c1: st.info("**Month-to-month + Fiber** = Highest churn. 1-year pe shift karo.")
-    with c2: st.success("**Tenure > 24M** wale ko loyalty bonus do, churn 70% kam hota hai.")
+    st.markdown('<div class="card-pro">', unsafe_allow_html=True)
+    st.markdown("#### 📋 Input Summary (19 Features)")
+    summary = {
+        "Feature": ["gender","SeniorCitizen","Partner","Dependents","tenure","PhoneService","MultipleLines","InternetService","OnlineSecurity","OnlineBackup","DeviceProtection","TechSupport","StreamingTV","StreamingMovies","Contract","PaperlessBilling","PaymentMethod","MonthlyCharges","TotalCharges"],
+        "Value": [gender, SeniorCitizen, Partner, Dependents, tenure, PhoneService, MultipleLines, InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges]
+    }
+    st.dataframe(pd.DataFrame(summary), use_container_width=True, height=400)
+    st.markdown("#### 💡 Viva Point")
+    st.info("Sir, maine saare 19 original Telco features use kiye hai, pipeline me StandardScaler + OneHotEncoder lagaya hai taki production me koi feature mismatch na ho. Ye FAANG level MLOps practice hai.")
     st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown("<br><p style='text-align:center; color:#334155; font-size:11px; letter-spacing:2px;'>GREENBANK AI PRO • DESIGNED FOR SCALE • INDIA 2026</p>", unsafe_allow_html=True)
